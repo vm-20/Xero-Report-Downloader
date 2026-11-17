@@ -1,4 +1,4 @@
-# Xero Reports — Edge extension (v1.5)
+# Xero Reports — Edge extension (v1.2)
 
 One click downloads all reports for the Xero client you have open.
 

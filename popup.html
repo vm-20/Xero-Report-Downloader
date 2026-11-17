@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!-- popup.html — the window shown when you click the extension icon.
+     Prime Partners branding. Colours come from Prime Tools brand.js:
+     navy #000d40, blue #0645b9, yellow #ffde59, tint #f5f8fc -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Prime Partners | Xero Reports</title>
+  <style>
+    :root {
+      --navy: #000d40;
+      --blue: #0645b9;
+      --yellow: #ffde59;
+      --tint: #f5f8fc;
+      --line: #e3e8f0;
+      --text: #1b2333;
+      --muted: #5f6b7d;
+      --green: #1e7a46;
+      --red: #b42318;
+      --amber: #a15c07;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; width: 360px;
+      font-family: "Segoe UI", Arial, sans-serif; font-size: 13px;
+      color: var(--text); background: #fff;
+    }
+
+    /* ---------- Header ---------- */
+    header {
+      background: var(--navy); color: #fff;
+      padding: 14px 16px 12px; border-bottom: 3px solid var(--yellow);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .mark {
+      width: 34px; height: 34px; border-radius: 6px; flex: none;
+      background: var(--yellow); color: var(--navy);
+      font-weight: 700; font-size: 14px; letter-spacing: .5px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand { line-height: 1.2; }
+    .brand .firm { font-size: 14px; font-weight: 600; }
+    .brand .tool { font-size: 11px; color: #c7cfe6; text-transform: uppercase; letter-spacing: .8px; }
+
+    main { padding: 14px 16px 10px; }
+
+    /* ---------- Client card ---------- */
+    .label { font-size: 10.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 4px; }
+    #client {
+      background: var(--tint); border: 1px solid var(--line); border-left: 3px solid var(--blue);
+      border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;
+    }
+    #clientName { font-weight: 600; font-size: 13px; }
+    #clientCode { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    #client.bad { border-left-color: var(--red); background: #fdf3f2; }
+    #client.bad #clientName { color: var(--red); font-weight: 500; }
+
+    /* ---------- Button ---------- */
+    #start {
+      width: 100%; padding: 10px 12px; border: 0; border-radius: 6px;
+      background: var(--blue); color: #fff; font-size: 13.5px; font-weight: 600;
+      font-family: inherit; cursor: pointer; transition: background .15s;
+    }
+    #start:hover:not(:disabled) { background: var(--navy); }
+    #start:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+    #start:disabled { background: #a9b3c4; cursor: default; }
+
+    /* ---------- Progress ---------- */
+    .progress-head { display: flex; justify-content: space-between; margin: 14px 0 5px; }
+    #count { font-size: 11px; color: var(--muted); }
+    #bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+    #fill { height: 100%; width: 0; background: var(--blue); transition: width .3s; }
+
+    /* ---------- Report list ---------- */
+    ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    #list > li { padding: 8px 0; border-bottom: 1px solid var(--line); }
+    #list > li:last-child { border-bottom: 0; }
+    .row { display: flex; align-items: center; gap: 8px; }
+    .name { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .secs { font-size: 11px; color: var(--muted); }
+    .file { font-size: 11px; color: var(--muted); margin: 3px 0 0 16px; word-break: break-all; }
+    .err  { font-size: 11px; color: var(--red);   margin: 3px 0 0 16px; word-break: break-word; }
+
+    /* Status dot (left) */
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: #c3cad6; }
+    .s-running > .row > .dot { background: var(--blue); animation: pulse 1s infinite; }
+    .s-success > .row > .dot { background: var(--green); }
+    .s-failed  .dot { background: var(--red); }
+    .s-partial > .row > .dot { background: var(--amber); }
+    @keyframes pulse { 50% { opacity: .3; } }
+
+    /* Status badge (right) */
+    .badge {
+      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+      padding: 2px 7px; border-radius: 10px; background: #eef1f5; color: var(--muted);
+    }
+    .s-running > .row > .badge { background: #e6eefc; color: var(--blue); }
+    .s-success > .row > .badge { background: #e7f4ec; color: var(--green); }
+    .s-failed  .badge { background: #fdecea; color: var(--red); }
+    .s-partial > .row > .badge { background: #fdf2e1; color: var(--amber); }
+
+    /* Loop items (e.g. bank accounts) */
+    .items { margin: 6px 0 0 16px; border-left: 2px solid var(--line); padding-left: 10px; }
+    .items li { padding: 3px 0; font-size: 12px; }
+    .items .name { font-weight: 400; }
+
+    /* ---------- Messages ---------- */
+    .msg { margin-top: 10px; padding: 8px 10px; border-radius: 6px; font-size: 12px; display: none; }
+    .msg.show { display: block; }
+    #warning { background: #fdf6e3; color: var(--amber); border: 1px solid #f3e1b5; }
+    #summary.ok   { background: #e7f4ec; color: var(--green); border: 1px solid #c4e4d0; font-weight: 600; }
+    #summary.bad  { background: #fdecea; color: var(--red);   border: 1px solid #f5c6c1; font-weight: 600; }
+    #summary.info { background: var(--tint); color: var(--text); border: 1px solid var(--line); }
+
+    footer {
+      padding: 8px 16px 10px; border-top: 1px solid var(--line);
+      font-size: 10.5px; color: var(--muted); display: flex; justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="mark" aria-hidden="true">PP</div>
+    <div class="brand">
+      <div class="firm">Prime Partners</div>
+      <div class="tool">Xero Report Downloader</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="label">Client</div>
+    <div id="client">
+      <div id="clientName">Detecting client...</div>
+      <div id="clientCode"></div>
+    </div>
+
+    <button id="start" disabled>Download All Reports</button>
+
+    <div class="progress-head">
+      <span class="label" style="margin:0">Progress</span>
+      <span id="count"></span>
+    </div>
+    <div id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="fill"></div></div>
+
+    <ul id="list"></ul>
+
+    <div id="warning" class="msg" role="status"></div>
+    <div id="summary" class="msg" role="status"></div>
+  </main>
+
+  <footer>
+    <span>Prime Partners - Internal tool</span>
+    <span id="version"></span>
+  </footer>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
